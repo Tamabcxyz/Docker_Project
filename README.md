@@ -106,8 +106,16 @@ Overlay2
     to chek run: docker network ls
     ```               
 - None (docker run ubuntu --network=none)           
-- Host (docker run ubuntu --network=host)           
+- Host (docker run ubuntu --network=host)     
 
+##### Check the network info
+docker network inspect bridge
+docker network inspect host
+docker network inspect none
+
+##### Attach container to network
+docker network connect <network_name> <container_name_or_id> (container is exist)   
+docker run --network=<network_name> --name=<name-container> name-image (container is not exist)     
 
 What location are the files related to the docker containers and images stored?     
 ==>/var/lib/docker
