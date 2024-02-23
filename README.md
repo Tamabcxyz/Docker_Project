@@ -191,4 +191,55 @@ Docker For Windows Container Types:
 
 Windows Server Core: Windows container on native windows server core                
 
-Hyper-V Isolation: Windows container on an isolated hyper-v kernel              
+Hyper-V Isolation: Windows container on an isolated hyper-v kernel  
+
+##### Create docker registry in local
+```
+mkdir registry
+apt get update
+apt-get install openssl
+mkdir -p /tools/registry/ && cd /tools/registry
+mkdir data certs
+openssl req -newkey rsa:4096 -nodes -sha256 -keyout certs/domain.key -subj "/CN=192.168.1.100" -addext "subjectAltName = DNS:192.168.1.100,IP:192.168.1.100" -x509 -days 365 -out certs/domain.crt
+vi docker-compose.yml
+    version: '3'
+    services:
+    registry:
+        image: registry:2
+        restart: always
+        container_name: registry-server
+        ports:
+        - "5000:5000"
+        volumes:
+        - ./data:/var/lib/registry
+        - ./certs:/certs
+        environment:
+        REGISTRY_HTTP_TLS_CERTIFICATE: ./certs/domain.crt
+        REGISTRY_HTTP_TLS_KEY: ./certs/domain.key
+docker-compose up -d
+docker-compose ps
+docker login 192.168.1.100:5000 (failed to verify certificate)
+mkdir -p /etc/docker/certs.d/192.168.1.100:5000/
+cp certs/domain.crt /etc/docker/certs.d/192.168.1.100:5000/ca.crt
+systemctl restart docker
+docker login 192.168.1.100:5000 (OK)
+#copy file domain.crt to client and do it again
+```
+
+##### Script install docker and docker compose
+```
+#!/bin/bash
+
+sudo apt update
+sudo apt install -y apt-transport-https ca-certificates curl software-properties-common
+curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg
+echo "deb [signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+sudo apt update
+sudo apt install -y docker-ce
+sudo systemctl start docker
+sudo systemctl enable docker
+sudo curl -L "https://github.com/docker/compose/releases/latest/download/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+sudo chmod +x /usr/local/bin/docker-compose
+docker --version
+docker-compose --version
+```
