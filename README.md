@@ -6,6 +6,22 @@ Or just donwlonad and run script:
 curl -fsSL https://get.docker.com -o get-docker.sh
 sudo sh get-docker.sh
 
+If you using kali and can not install kali-rolling we can using bookworm
+echo "deb [arch=amd64 signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/debian bookworm stable" | sudo tee /etc/apt/sources.list.d/docker.list
+sudo apt update
+sudo apt install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
+sudo chmod 666 /var/run/docker.sock
+
+Feature	            Kali-Rolling (Based on Debian Testing)	            Debian Bookworm (Stable)
+Release Type	    Rolling release	                                    Fixed release
+Base System	        Based on Debian Testing (not stable)	            Official Debian Stable release
+Software Updates	Frequent updates, always gets new versions	        Updates only for security & stability
+Stability	        Less stable, as it gets frequent updates	        Highly stable, thoroughly tested
+Use Case	        Penetration testing, cybersecurity	                General-purpose OS, servers, workstations
+Security Updates	Fast updates but can introduce bugs	                Very stable and security-focused
+Version Example	    Kali-Rolling 2022.4 → Always updated	            Debian 12 ("Bookworm") (released in 2023)
+
+
 check version:
 docker version
 docker info
@@ -17,6 +33,20 @@ Only pull images
 docker pull <images-name>         
 Just do a quick pull and run            
 docker run <images-name>
+
+#### Create a container from Dockerfile: 
+```
+docker build [OPTIONS] PATH | URL | -
+```
+```
+Option	Description
+-t	Assigns a name (tag) to the built image.
+-f	Specifies a custom Dockerfile (if it's not named Dockerfile).
+--no-cache	Forces a clean build (ignores cache).
+--build-arg	Passes variables to the build process.
+-q	Quiet mode (only outputs image ID).
+```
+Ex: docker build -t my-custom-image -f MyDockerfile .
 
 #### Run start a container
 ```
